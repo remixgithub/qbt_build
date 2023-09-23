@@ -1,0 +1,74 @@
+name: qbt
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: windows-2019
+    steps:
+    - uses: ilammy/msvc-dev-cmd@v1
+    - name: zlib
+      run: |
+        aria2c https://www.zlib.net/zlib-1.3.tar.gz
+        tar xf zlib-1.3.tar.gz
+        cd zlib-1.3
+        nmake -f win32/Makefile.msc
+        xcopy zconf.h C:\qbt\include\
+        xcopy zlib.h C:\qbt\include\
+        xcopy zlib.lib C:\qbt\lib\
+    - name: openssl
+      run: |
+        aria2c https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/win64/nasm-2.16.01-win64.zip
+        7z x nasm-2.16.01-win64.zip
+        xcopy nasm-2.16.01\nasm.exe C:\qbt\bin\
+        aria2c https://download.qt.io/official_releases/jom/jom_1_1_4.zip
+        7z x jom_1_1_4.zip
+        xcopy jom.exe C:\qbt\bin\
+        aria2c https://www.openssl.org/source/openssl-1.1.1w.tar.gz
+        tar xf openssl-1.1.1w.tar.gz
+        cd openssl-1.1.1w
+        $env:PATH += ";C:\qbt\bin\"
+        perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt --with-zlib-include=C:\qbt\include --with-zlib-lib=C:\qbt\lib\zlib.lib /FS
+        jom
+        nmake install_sw
+    - name: qt
+      run: |
+        aria2c https://download.qt.io/official_releases/qt/5.15/5.15.10/single/qt-everywhere-opensource-src-5.15.10.zip
+        7z x qt-everywhere-opensource-src-5.15.10.zip
+        cd qt-everywhere-src-5.15.10
+        xcopy "gnuwin32" C:\qt\clean\gnuwin32 /E /H /C /I | Out-Null
+        xcopy "qtbase" C:\qt\clean\qtbase /E /H /C /I | Out-Null
+        xcopy "qtsvg" C:\qt\clean\qtsvg /E /H /C /I | Out-Null
+        xcopy "qttools" C:\qt\clean\qttools /E /H /C /I | Out-Null
+        xcopy "qtwinextras" C:\qt\clean\qtwinextras /E /H /C /I | Out-Null
+        xcopy .gitmodules C:\qt\clean\ | Out-Null
+        xcopy configure.bat C:\qt\clean\ | Out-Null
+        xcopy configure.json C:\qt\clean\ | Out-Null
+        xcopy qt.pro C:\qt\clean\
+        mkdir C:\qt\build
+        cd C:\qt\build
+        C:\qt\clean\configure -prefix C:\qbt\qt5 -I C:\qbt\include -L C:\qbt\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -nomake tests -openssl-linked -strip
+        $env:PATH += ";C:\qbt\bin\"
+        jom
+        jom install
+    - name: boost
+      run: |
+        aria2c https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.7z
+        7z x boost_1_83_0.7z -oC:\
+    - name: libtorrent
+      run: |
+        git clone --depth 1 --branch v1.2.15 https://github.com/arvidn/libtorrent C:\libtorrent
+        cd C:\libtorrent
+        $env:PATH += ";C:\qbt\bin\"
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\boost_1_83_0 -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\libtorrent_install -DOPENSSL_ROOT_DIR=C:\qbt
+        cmake --build build
+        cmake --install build
+    - name: qbittorrent
+      run: |
+        git clone --depth 1 --branch v4_4_x https://github.com/qbittorrent/qBittorrent C:\qbittorrent
+        cd C:\qbittorrent
+        $env:PATH += ";C:\qbt\bin\"
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\boost_1_83_0 -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DLibtorrentRasterbar_DIR=C:\libtorrent_install\lib\cmake\LibtorrentRasterbar -DOPENSSL_ROOT_DIR=C:\qbt -DZLIB_ROOT=C:\qbt -DQt5_DIR=C:\qbt\qt5
+        cmake --build build
+    - uses: actions/upload-artifact@v3
+      with:
+        name: qbittorrent
+        path: C:\qbittorrent\build\qbittorrent.exe
