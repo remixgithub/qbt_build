@@ -22,9 +22,9 @@ jobs:
         aria2c https://download.qt.io/official_releases/jom/jom_1_1_4.zip
         7z x jom_1_1_4.zip
         xcopy jom.exe C:\qbt\bin\
-        aria2c https://www.openssl.org/source/openssl-1.1.1w.tar.gz
-        tar xf openssl-1.1.1w.tar.gz
-        cd openssl-1.1.1w
+        aria2c https://www.openssl.org/source/openssl-3.1.3.tar.gz
+        tar xf openssl-3.1.3.tar.gz
+        cd openssl-3.1.3
         $env:PATH += ";C:\qbt\bin\"
         perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt --with-zlib-include=C:\qbt\include --with-zlib-lib=C:\qbt\lib\zlib.lib /FS
         jom
@@ -53,22 +53,45 @@ jobs:
       run: |
         aria2c https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.7z
         7z x boost_1_83_0.7z -oC:\
-    - name: libtorrent
+    - name: libtorrent12
       run: |
-        git clone --depth 1 --branch RC_1_2 https://github.com/arvidn/libtorrent C:\libtorrent
-        cd C:\libtorrent
+        git clone --depth 1 --branch RC_1_2 https://github.com/arvidn/libtorrent
+        cd libtorrent
         $env:PATH += ";C:\qbt\bin\"
-        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\boost_1_83_0 -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\libtorrent_install -DOPENSSL_ROOT_DIR=C:\qbt
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\boost_1_83_0 -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\libtorrent12 -DOPENSSL_ROOT_DIR=C:\qbt
         cmake --build build
         cmake --install build
-    - name: qbittorrent
+    - name: qbittorrent12
       run: |
-        git clone --depth 1 --branch v4_4_x https://github.com/qbittorrent/qBittorrent C:\qbittorrent
-        cd C:\qbittorrent
+        git clone --depth 1 --branch v4_5_x https://github.com/qbittorrent/qBittorrent
+        cd qbittorrent
         $env:PATH += ";C:\qbt\bin\"
-        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\boost_1_83_0 -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DLibtorrentRasterbar_DIR=C:\libtorrent_install\lib\cmake\LibtorrentRasterbar -DOPENSSL_ROOT_DIR=C:\qbt -DZLIB_ROOT=C:\qbt -DQt5_DIR=C:\qbt\qt5
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\boost_1_83_0 -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DLibtorrentRasterbar_DIR=C:\libtorrent12\lib\cmake\LibtorrentRasterbar -DOPENSSL_ROOT_DIR=C:\qbt -DZLIB_ROOT=C:\qbt -DQt5_DIR=C:\qbt\qt5 -DCMAKE_INSTALL_PREFIX=C:\qbittorrent12
         cmake --build build
+        cmake --install build --strip
+    - name: clean
+      run: |
+        rm libtorrent -r -force
+        rm qbittorrent -r -force
+    - name: libtorrent20
+      run: |
+        git clone --depth 1 --branch RC_2_0 --recurse-submodules https://github.com/arvidn/libtorrent
+        cd libtorrent
+        $env:PATH += ";C:\qbt\bin\"
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\boost_1_83_0 -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\libtorrent20 -DOPENSSL_ROOT_DIR=C:\qbt
+        cmake --build build
+        cmake --install build
+    - name: qbittorrent20
+      run: |
+        git clone --depth 1 --branch v4_5_x https://github.com/qbittorrent/qBittorrent
+        cd qbittorrent
+        $env:PATH += ";C:\qbt\bin\"
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=C:\boost_1_83_0 -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DLibtorrentRasterbar_DIR=C:\libtorrent20\lib\cmake\LibtorrentRasterbar -DOPENSSL_ROOT_DIR=C:\qbt -DZLIB_ROOT=C:\qbt -DQt5_DIR=C:\qbt\qt5 -DCMAKE_INSTALL_PREFIX=C:\qbittorrent20
+        cmake --build build
+        cmake --install build --strip
     - uses: actions/upload-artifact@v3
       with:
         name: qbittorrent
-        path: C:\qbittorrent\build\qbittorrent.exe
+        path: |
+          C:\qbittorrent12
+          C:\qbittorrent20
