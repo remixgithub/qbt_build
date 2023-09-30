@@ -55,7 +55,7 @@ jobs:
         7z x boost_1_83_0.7z -oC:\
     - name: libtorrent
       run: |
-        git clone --depth 1 --branch RC_1_2 https://github.com/arvidn/libtorrent
+        git clone --depth 1 --branch v1.2.19 https://github.com/arvidn/libtorrent
         cd libtorrent
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\libtorrent -DBOOST_ROOT=C:\boost_1_83_0 -DOPENSSL_ROOT_DIR=C:\qbt
@@ -63,7 +63,7 @@ jobs:
         cmake --install build
     - name: qbittorrent
       run: |
-        git clone --depth 1 --branch v4_5_x https://github.com/qbittorrent/qBittorrent
+        git clone --depth 1 --branch release-4.4.5 https://github.com/qbittorrent/qBittorrent
         cd qbittorrent
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbittorrent -DBOOST_ROOT=C:\boost_1_83_0 -DOPENSSL_ROOT_DIR=C:\qbt -DZLIB_ROOT=C:\qbt -DQt5_DIR=C:\qbt\qt5 -DLibtorrentRasterbar_DIR=C:\libtorrent\lib\cmake\LibtorrentRasterbar
