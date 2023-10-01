@@ -55,7 +55,7 @@ jobs:
         7z x boost_1_83_0.7z -oC:\
     - name: libtorrent
       run: |
-        git clone --depth 1 --branch v1.2.19 https://github.com/arvidn/libtorrent
+        git clone --depth 1 --branch v1.2.15 https://github.com/arvidn/libtorrent
         cd libtorrent
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\libtorrent -DBOOST_ROOT=C:\boost_1_83_0 -DOPENSSL_ROOT_DIR=C:\qbt
