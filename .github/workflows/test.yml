@@ -21,7 +21,7 @@ jobs:
         aria2c https://download.qt.io/official_releases/jom/jom_1_1_4.zip
         7z x jom_1_1_4.zip
         xcopy jom.exe C:\qbt\bin\
-        git clone --depth 1 --branch OpenSSL_1_1_1w --recurse-submodules https://github.com/openssl/openssl
+        git clone --depth 1 --branch OpenSSL_1_1_1w https://github.com/openssl/openssl
         cd openssl
         $env:PATH += ";C:\qbt\bin\"
         perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt --with-zlib-include=C:\qbt\include --with-zlib-lib=C:\qbt\lib\zlib.lib /FS
@@ -32,7 +32,7 @@ jobs:
         git clone --depth 1 --branch v5.15.10-lts-lgpl https://github.com/qt/qt5
         cd qt5
         git submodule update --init -- qtbase qtsvg qttools qtwinextras
-        configure -prefix C:\qbt\qt5 -I C:\qbt\include -L C:\qbt\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -nomake tests -openssl-linked -strip
+        configure.bat -prefix C:\qbt\qt5 -I C:\qbt\include -L C:\qbt\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -nomake tests -openssl-linked -strip
         $env:PATH += ";C:\qbt\bin\"
         jom
         jom install
