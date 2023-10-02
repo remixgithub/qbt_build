@@ -36,7 +36,27 @@ jobs:
         $env:PATH += ";C:\qbt\bin\"
         jom
         jom install
+    - name: boost
+      run: |
+        aria2c https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.7z
+        7z x boost_1_83_0.7z -oC:\
+    - name: libtorrent
+      run: |
+        git clone --depth 1 --branch v1.2.15 https://github.com/arvidn/libtorrent
+        cd libtorrent
+        $env:PATH += ";C:\qbt\bin\"
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\libtorrent -DBOOST_ROOT=C:\boost_1_83_0 -DOPENSSL_ROOT_DIR=C:\qbt
+        cmake --build build
+        cmake --install build
+    - name: qbittorrent
+      run: |
+        git clone --depth 1 --branch release-4.4.5 https://github.com/qbittorrent/qBittorrent
+        cd qbittorrent
+        $env:PATH += ";C:\qbt\bin\"
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbittorrent -DBOOST_ROOT=C:\boost_1_83_0 -DOPENSSL_ROOT_DIR=C:\qbt -DZLIB_ROOT=C:\qbt -DQt5_DIR=C:\qbt\qt5 -DLibtorrentRasterbar_DIR=C:\libtorrent\lib\cmake\LibtorrentRasterbar
+        cmake --build build
+        cmake --install build
     - uses: actions/upload-artifact@v3
       with:
-        name: test
-        path: C:\qbt
+        name: qbittorrent
+        path: C:\qbittorrent\bin\qbittorrent.exe
