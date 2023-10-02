@@ -1,0 +1,33 @@
+name: test
+on: push
+jobs:
+  build:
+    runs-on: windows-2019
+    steps:
+    - uses: ilammy/msvc-dev-cmd@v1
+    - name: zlib
+      run: |
+        git clone --depth 1 --branch v1.3
+        cd zlib
+        nmake -f win32/Makefile.msc
+        xcopy zconf.h C:\qbt\include\
+        xcopy zlib.h C:\qbt\include\
+        xcopy zlib.lib C:\qbt\lib\
+    - name: openssl
+      run: |
+        aria2c https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/win64/nasm-2.16.01-win64.zip
+        7z x nasm-2.16.01-win64.zip
+        xcopy nasm-2.16.01\nasm.exe C:\qbt\bin\
+        aria2c https://download.qt.io/official_releases/jom/jom_1_1_4.zip
+        7z x jom_1_1_4.zip
+        xcopy jom.exe C:\qbt\bin\
+        git clone --depth 1 --branch OpenSSL_1_1_1w https://github.com/openssl/openssl
+        cd openssl
+        $env:PATH += ";C:\qbt\bin\"
+        perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt --with-zlib-include=C:\qbt\include --with-zlib-lib=C:\qbt\lib\zlib.lib /FS
+        jom
+        nmake install_sw
+    - uses: actions/upload-artifact@v3
+      with:
+        name: test
+        path: C:\qbt
