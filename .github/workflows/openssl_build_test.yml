@@ -22,11 +22,11 @@ jobs:
         aria2c https://download.qt.io/official_releases/jom/jom_1_1_4.zip
         7z x jom_1_1_4.zip
         xcopy jom.exe C:\qbt\bin\
-        aria2c https://www.openssl.org/source/openssl-1.1.1w.tar.gz
-        tar xf openssl-1.1.1w.tar.gz
-        cd openssl-1.1.1w
+        aria2c https://www.openssl.org/source/openssl-3.0.11.tar.gz
+        tar xf openssl-3.0.11.tar.gz
+        cd openssl-3.0.11
         $env:PATH += ";C:\qbt\bin\"
-        perl Configure VC-WIN64A no-shared no-tests no-apps --prefix=C:\qbt --with-zlib-include=C:\qbt\include --with-zlib-lib=C:\qbt\lib\zlib.lib /FS
+        perl Configure VC-WIN64A no-shared no-tests no-apps no-legacy --prefix=C:\qbt --with-zlib-include=C:\qbt\include --with-zlib-lib=C:\qbt\lib\zlib.lib /FS
         jom
         nmake install_sw
     - uses: actions/upload-artifact@v3
