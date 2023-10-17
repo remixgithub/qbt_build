@@ -8,7 +8,7 @@ jobs:
     - name: zlib
       run: |
         git clone --depth 1 --branch v1.3 https://github.com/madler/zlib.git
-        cd zlib-1.3
+        cd zlib
         nmake -f win32/Makefile.msc
         xcopy zconf.h C:\qbt\zlib\include\
         xcopy zlib.h C:\qbt\zlib\include\
@@ -22,7 +22,7 @@ jobs:
         7z x jom_1_1_4.zip
         xcopy jom.exe C:\qbt\bin\
         git clone --depth 1 --branch OpenSSL_1_1_1w https://github.com/openssl/openssl.git
-        cd openssl-1.1.1w
+        cd openssl
         $env:PATH += ";C:\qbt\bin\"
         perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt\openssl /FS
         jom
@@ -30,7 +30,7 @@ jobs:
     - name: qt
       run: |
         git clone --depth 1 --branch v5.15.11-lts-lgpl https://github.com/qt/qt5.git
-        cd qt5-5.15.11-lts-lgpl
+        cd qt5
         submodule init qtbase qtsvg qttools qtwinextras
         configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -nomake tests -openssl-linked -strip
         $env:PATH += ";C:\qbt\bin\"
