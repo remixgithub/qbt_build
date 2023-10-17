@@ -31,7 +31,7 @@ jobs:
       run: |
         git clone --depth 1 --branch v5.15.11-lts-lgpl https://github.com/qt/qt5.git
         cd qt5
-        git submodule init qtbase qtsvg qttools qtwinextras
+        git submodule update --init --recursive qtbase qtsvg qttools qtwinextras
         .\configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -nomake tests -openssl-linked -strip
         $env:PATH += ";C:\qbt\bin\"
         jom
