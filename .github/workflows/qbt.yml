@@ -7,7 +7,7 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1
     - name: zlib
       run: |
-        git clone --depth 1 --branch v1.3 https://github.com/madler/zlib.git
+        git clone --branch v1.3 https://github.com/madler/zlib.git
         cd zlib
         nmake -f win32/Makefile.msc
         xcopy zconf.h C:\qbt\zlib\include\
@@ -21,7 +21,7 @@ jobs:
         aria2c https://download.qt.io/official_releases/jom/jom_1_1_4.zip
         7z x jom_1_1_4.zip
         xcopy jom.exe C:\qbt\bin\
-        git clone --depth 1 --branch OpenSSL_1_1_1w https://github.com/openssl/openssl.git
+        git clone --branch OpenSSL_1_1_1w https://github.com/openssl/openssl.git
         cd openssl
         $env:PATH += ";C:\qbt\bin\"
         perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt\openssl /FS
@@ -29,7 +29,7 @@ jobs:
         nmake install_sw
     - name: qt
       run: |
-        git clone --depth 1 --branch v5.15.11-lts-lgpl https://github.com/qt/qt5.git
+        git clone --branch v5.15.11-lts-lgpl https://github.com/qt/qt5.git
         cd qt5
         git submodule update --init qtbase qtsvg qttools qtwinextras
         .\configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib -I C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -nomake tests -openssl-linked -strip
@@ -42,7 +42,7 @@ jobs:
         7z x boost_1_83_0.7z -oC:\qbt\
     - name: libtorrent
       run: |
-        git clone --depth 1 --branch 7af8fe61390d385cd731aedfdc6b8002866d0e73 https://github.com/arvidn/libtorrent
+        git clone --branch 7af8fe61390d385cd731aedfdc6b8002866d0e73 https://github.com/arvidn/libtorrent
         cd libtorrent
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost_1_83_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl
@@ -50,7 +50,7 @@ jobs:
         cmake --install build
     - name: qbittorrent
       run: |
-        git clone --depth 1 --branch release-4.4.5 https://github.com/qbittorrent/qBittorrent
+        git clone --branch release-4.4.5 https://github.com/qbittorrent/qBittorrent
         cd qbittorrent
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\qbittorrent -DBOOST_ROOT=C:\qbt\boost_1_83_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar
