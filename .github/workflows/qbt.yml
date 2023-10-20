@@ -21,7 +21,7 @@ jobs:
         aria2c https://download.qt.io/official_releases/jom/jom_1_1_4.zip
         7z x jom_1_1_4.zip
         xcopy jom.exe C:\qbt\bin\
-        git clone --branch OpenSSL_1_1_1w https://github.com/openssl/openssl.git
+        git clone --branch openssl-3.1.3 https://github.com/openssl/openssl.git
         cd openssl
         $env:PATH += ";C:\qbt\bin\"
         perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt\openssl /FS
@@ -42,9 +42,8 @@ jobs:
         7z x boost_1_83_0.7z -oC:\qbt\
     - name: libtorrent
       run: |
-        git clone https://github.com/arvidn/libtorrent.git
+        git clone --branch v1.2.15 https://github.com/arvidn/libtorrent.git
         cd libtorrent
-        git checkout 7af8fe61390d385cd731aedfdc6b8002866d0e73
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost_1_83_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl
         cmake --build build
