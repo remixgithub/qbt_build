@@ -32,7 +32,7 @@ jobs:
         git clone --branch v5.15.11-lts-lgpl https://github.com/qt/qt5.git
         cd qt5
         git submodule update --init qtbase qtsvg qttools qtwinextras
-        .\configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib -I C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -nomake tests -openssl-linked -strip
+        .\configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib -I C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -openssl-linked
         $env:PATH += ";C:\qbt\bin\"
         jom
         jom install
