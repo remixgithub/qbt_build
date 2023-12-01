@@ -45,7 +45,7 @@ jobs:
         .\b2.exe install --prefix=C:\qbt\boost release
     - name: libtorrent
       run: |
-        git clone --branch RC_1_2 https://github.com/arvidn/libtorrent.git
+        git clone --branch v1.2.15 https://github.com/arvidn/libtorrent.git
         cd libtorrent
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost -DOPENSSL_ROOT_DIR=C:\qbt\openssl -Wno-dev
