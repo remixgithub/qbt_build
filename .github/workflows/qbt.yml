@@ -2,7 +2,7 @@ name: qbt
 on: workflow_dispatch
 jobs:
   build:
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
     - uses: ilammy/msvc-dev-cmd@v1
     - name: zlib
@@ -51,9 +51,9 @@ jobs:
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost -DOPENSSL_ROOT_DIR=C:\qbt\openssl -Wno-dev
         cmake --build build
         cmake --install build
-    - name: qbittorrent44x
+    - name: qbittorrent
       run: |
-        git clone --branch test https://github.com/remixgithub/qBittorrent.git
+        git clone --branch 439 https://github.com/remixgithub/qBittorrent.git
         cd qbittorrent 
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent -DBOOST_ROOT=C:\qbt\boost -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
