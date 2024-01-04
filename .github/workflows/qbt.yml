@@ -45,7 +45,7 @@ jobs:
         .\b2.exe install release address-model=64 --prefix=C:\qbt\boost
     - name: libtorrent
       run: |
-        git clone --branch RC_1_2 https://github.com/remixgithub/libtorrent.git
+        git clone --branch v1.2.15 https://github.com/remixgithub/libtorrent.git
         cd libtorrent
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost -DOPENSSL_ROOT_DIR=C:\qbt\openssl -Wno-dev
@@ -53,10 +53,10 @@ jobs:
         cmake --install build
     - name: qbittorrent44x
       run: |
-        git clone --branch release-4.4.5 https://github.com/qbittorrent/qBittorrent.git qbittorrent44x
-        cd qbittorrent44x
+        git clone --branch test https://github.com/remixgithub/qBittorrent.git
+        cd qbittorrent 
         $env:PATH += ";C:\qbt\bin\"
-        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent44x -DBOOST_ROOT=C:\qbt\boost -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent -DBOOST_ROOT=C:\qbt\boost -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
         cmake --build build
         cmake --install build
     - uses: actions/upload-artifact@v3
