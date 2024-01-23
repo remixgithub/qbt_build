@@ -7,7 +7,7 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1
     - name: zlib
       run: |
-        git clone --branch v1.3 https://github.com/madler/zlib.git
+        git clone --branch v1.3.1 https://github.com/madler/zlib.git
         cd zlib
         nmake -f win32/Makefile.msc
         xcopy zconf.h C:\qbt\zlib\include\
