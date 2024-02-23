@@ -45,7 +45,7 @@ jobs:
         .\b2.exe install release address-model=64 --prefix=C:\qbt\boost
     - name: libtorrent
       run: |
-        git clone --branch v1.2.15 https://github.com/arvidn/libtorrent.git
+        git clone --branch RC_1_2 https://github.com/arvidn/libtorrent.git
         cd libtorrent
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost -DOPENSSL_ROOT_DIR=C:\qbt\openssl -Wno-dev
@@ -53,7 +53,7 @@ jobs:
         cmake --install build
     - name: qbittorrent
       run: |
-        git clone --branch v4_4_x https://github.com/qbittorrent/qBittorrent.git
+        git clone --branch v4_6_x https://github.com/qbittorrent/qBittorrent.git
         cd qbittorrent 
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent -DBOOST_ROOT=C:\qbt\boost -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
