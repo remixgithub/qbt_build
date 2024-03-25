@@ -2,7 +2,7 @@ name: qbt
 on: workflow_dispatch
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
     - uses: ilammy/msvc-dev-cmd@v1
     - name: zlib
