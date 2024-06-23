@@ -21,7 +21,7 @@ jobs:
         aria2c https://download.qt.io/official_releases/jom/jom_1_1_4.zip
         7z x jom_1_1_4.zip
         xcopy jom.exe C:\qbt\bin\
-        git clone --branch openssl-3.3.0 https://github.com/openssl/openssl.git
+        git clone --branch openssl-3.3.1 https://github.com/openssl/openssl.git
         cd openssl
         $env:PATH += ";C:\qbt\bin\"
         perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt\openssl /FS
