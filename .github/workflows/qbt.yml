@@ -40,9 +40,7 @@ jobs:
       run: |
         aria2c https://boostorg.jfrog.io/artifactory/main/release/1.85.0/source/boost_1_85_0.7z
         7z x boost_1_85_0.7z
-        cd boost_1_85_0
-        .\bootstrap.bat
-        .\b2.exe install release address-model=64 --prefix=C:\qbt\boost
+        mv boost_1_85_0 C:\qbt\boost
     - name: libtorrent
       run: |
         git clone --branch RC_1_2 https://github.com/arvidn/libtorrent.git
