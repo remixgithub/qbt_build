@@ -29,7 +29,7 @@ jobs:
         nmake install_sw
     - name: qt
       run: |
-        git clone --branch v5.15.13-lts-lgpl https://github.com/qt/qt5.git
+        git clone --branch v5.15.12-lts-lgpl https://github.com/qt/qt5.git
         cd qt5
         git submodule update --init qtbase qtsvg qttools qtwinextras
         .\configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib -I C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -openssl-linked
