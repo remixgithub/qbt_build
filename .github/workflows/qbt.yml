@@ -2,7 +2,7 @@ name: qbt
 on: workflow_dispatch
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
     - uses: ilammy/msvc-dev-cmd@v1
     - name: zlib
@@ -21,7 +21,7 @@ jobs:
         aria2c https://download.qt.io/official_releases/jom/jom_1_1_4.zip
         7z x jom_1_1_4.zip
         xcopy jom.exe C:\qbt\bin\
-        git clone --branch openssl-3.3.2 https://github.com/openssl/openssl.git
+        git clone --branch openssl-3.4.0 https://github.com/openssl/openssl.git
         cd openssl
         $env:PATH += ";C:\qbt\bin\"
         perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt\openssl /FS
@@ -29,7 +29,7 @@ jobs:
         nmake install_sw
     - name: qt
       run: |
-        git clone --branch v5.15.15-lts-lgpl https://github.com/qt/qt5.git
+        git clone --branch v5.15.16-lts-lgpl https://github.com/qt/qt5.git
         cd qt5
         git submodule update --init qtbase qtsvg qttools qtwinextras
         .\configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib -I C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -openssl-linked
@@ -50,7 +50,7 @@ jobs:
         cmake --install build
     - name: qbittorrent
       run: |
-        git clone --branch v4_6_x https://github.com/qbittorrent/qBittorrent.git
+        git clone --branch v4_4_x https://github.com/qbittorrent/qBittorrent.git
         cd qbittorrent 
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
