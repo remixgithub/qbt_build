@@ -29,7 +29,7 @@ jobs:
         nmake install_sw
     - name: qt
       run: |
-        git clone --branch v5.15.16-lts-lgpl https://github.com/qt/qt5.git
+        git clone --branch v5.15.14-lts-lgpl https://github.com/qt/qt5.git
         cd qt5
         git submodule update --init qtbase qtsvg qttools qtwinextras
         .\configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib -I C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -openssl-linked
@@ -50,7 +50,7 @@ jobs:
         cmake --install build
     - name: qbittorrent
       run: |
-        git clone --branch v4_5_x https://github.com/qbittorrent/qBittorrent.git
+        git clone --branch v4_4_x https://github.com/qbittorrent/qBittorrent.git
         cd qbittorrent 
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
