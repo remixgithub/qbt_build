@@ -38,14 +38,14 @@ jobs:
         jom install
     - name: boost
       run: |
-        aria2c https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_1_86_0.7z
-        7z x -oC:\qbt\ boost_1_86_0.7z
+        aria2c https://archives.boost.io/release/1.87.0/source/boost_1_87_0.7z
+        7z x -oC:\qbt\ boost_1_87_0.7z
     - name: libtorrent
       run: |
         git clone --branch RC_1_2 https://github.com/arvidn/libtorrent.git
         cd libtorrent
         $env:PATH += ";C:\qbt\bin\"
-        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -Wno-dev
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost_1_87_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -Wno-dev
         cmake --build build
         cmake --install build
     - name: qbittorrent
@@ -54,7 +54,7 @@ jobs:
         aria2c https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_4_x.zip
         7z x qBittorrent-4_4_x.zip
         cd qBittorrent-4_4_x
-        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent445 -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent445 -DBOOST_ROOT=C:\qbt\boost_1_87_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
         cmake --build build
         cmake --install build
         aria2c https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_5_x.zip
