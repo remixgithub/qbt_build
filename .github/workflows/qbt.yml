@@ -48,7 +48,7 @@ jobs:
           cd C:\qbt\openssl
           perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt\openssl /FS
           jom
-          nmake install_sw
+          nmake install
 
       - name: Build Qt
         run: |
