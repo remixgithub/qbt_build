@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: windows-latest
     env:
-      PATH: C:\qbt\bin;${{ env.PATH }
+      PATH: C:\qbt\bin;${{ env.PATH }}
     strategy:
       matrix:
         version: [4_4_x, 4_5_x, 4_6_x]
