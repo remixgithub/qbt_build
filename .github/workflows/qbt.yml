@@ -5,6 +5,8 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      PATH: C:\qbt\bin;${{ env.PATH }
     strategy:
       matrix:
         version: [4_4_x, 4_5_x, 4_6_x]
@@ -30,7 +32,6 @@ jobs:
           7z x C:\qbt\downloads\nasm-2.16.03-win64.zip -oC:\qbt\bin
           7z x C:\qbt\downloads\jom_1_1_4.zip -oC:\qbt\bin
           7z x C:\qbt\downloads\boost_1_86_0.7z -oC:\qbt\
-          $env:PATH += ";C:\qbt\bin\"
 
       - name: Clone and Build Zlib
         run: |
