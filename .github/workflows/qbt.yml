@@ -5,16 +5,14 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: windows-latest
-    env:
-      PATH: C:\qbt\bin;${{ env.PATH }}
-    strategy:
-      matrix:
-        version: [4_4_x, 4_5_x, 4_6_x]
     steps:
       - uses: actions/checkout@v3
 
       - name: Setup MSVC Development Command Prompt
         uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Set Environment Path
+        run: echo "C:\qbt\bin;$env:PATH" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Cache Dependencies
         uses: actions/cache@v3
@@ -71,13 +69,30 @@ jobs:
           cmake --build build
           cmake --install build
 
-      - name: Build qBittorrent ${{ matrix.version }}
+      - name: Build qBittorrent 4.4.x
         run: |
-          $version = "${{ matrix.version }}"
-          aria2c -d C:\qbt\downloads -o qBittorrent-$version.zip "https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v$version.zip"
-          7z x "C:\qbt\downloads\qBittorrent-$version.zip" -oC:\qbt\qBittorrent-$version
-          cd C:\qbt\qBittorrent-$version\qBittorrent-$version
-          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent$version -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\Qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
+          aria2c -d C:\qbt\downloads -o qBittorrent-4_4_x.zip "https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_4_x.zip"
+          7z x "C:\qbt\downloads\qBittorrent-4_4_x.zip" -oC:\qbt\qBittorrent-4_4_x
+          cd C:\qbt\qBittorrent-4_4_x\qBittorrent-4_4_x
+          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent445 -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\Qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
+          cmake --build build
+          cmake --install build
+
+      - name: Build qBittorrent 4.5.x
+        run: |
+          aria2c -d C:\qbt\downloads -o qBittorrent-4_5_x.zip "https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_5_x.zip"
+          7z x "C:\qbt\downloads\qBittorrent-4_5_x.zip" -oC:\qbt\qBittorrent-4_5_x
+          cd C:\qbt\qBittorrent-4_5_x\qBittorrent-4_5_x
+          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent455 -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\Qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
+          cmake --build build
+          cmake --install build
+
+      - name: Build qBittorrent 4.6.x
+        run: |
+          aria2c -d C:\qbt\downloads -o qBittorrent-4_6_x.zip "https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_6_x.zip"
+          7z x "C:\qbt\downloads\qBittorrent-4_6_x.zip" -oC:\qbt\qBittorrent-4_6_x
+          cd C:\qbt\qBittorrent-4_6_x\qBittorrent-4_6_x
+          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent467 -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\Qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
           cmake --build build
           cmake --install build
 
