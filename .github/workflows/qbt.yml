@@ -1,92 +1,77 @@
-name: Build qBittorrent
-
+name: qbt
 on: workflow_dispatch
-
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
-      - name: Setup MSVC Development Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1
+    - uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Download Dependencies
-        run: |
-          aria2c -d C:\qbt\downloads https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/win64/nasm-2.16.03-win64.zip
-          aria2c -d C:\qbt\downloads https://download.qt.io/official_releases/jom/jom_1_1_4.zip
-          aria2c -d C:\qbt\downloads https://archives.boost.io/release/1.86.0/source/boost_1_86_0.7z
-          7z e C:\qbt\downloads\nasm-2.16.03-win64.zip -oC:\qbt\bin
-          7z x C:\qbt\downloads\jom_1_1_4.zip -oC:\qbt\bin
-          7z x C:\qbt\downloads\boost_1_86_0.7z -oC:\qbt\
+    - name: zlib
+      run: |
+        git clone --branch v1.3.1 https://github.com/madler/zlib.git
+        cd zlib
+        nmake -f win32/Makefile.msc
+        xcopy zconf.h C:\qbt\zlib\include
+        xcopy zlib.h C:\qbt\zlib\include
+        xcopy zlib.lib C:\qbt\zlib\lib
+    - name: openssl
+      run: |
+        aria2c https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/win64/nasm-2.16.03-win64.zip
+        7z x nasm-2.16.03-win64.zip
+        xcopy nasm-2.16.03\nasm.exe C:\qbt\bin
+        aria2c https://download.qt.io/official_releases/jom/jom_1_1_4.zip
+        7z x jom_1_1_4.zip
+        xcopy jom.exe C:\qbt\bin
+        git clone --branch openssl-3.4.0 https://github.com/openssl/openssl.git
+        cd openssl
+        $env:PATH += ";C:\qbt\bin"
+        perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt\openssl /FS
+        jom
+        nmake install_sw
+    - name: qt
+      run: |
+        git clone --branch v5.15.14-lts-lgpl https://github.com/qt/qt5.git
+        cd qt5
+        git submodule update --init qtbase qtsvg qttools qtwinextras
+        .\configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib -I C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -openssl-linked
+        $env:PATH += ";C:\qbt\bin"
+        jom
+        jom install
+    - name: boost
+      run: |
+        aria2c https://archives.boost.io/release/1.86.0/source/boost_1_87_0.7z
+        7z x -oC:\qbt\ boost_1_87_0.7z
+    - name: libtorrent
+      run: |
+        git clone --branch RC_1_2 https://github.com/arvidn/libtorrent.git
+        cd libtorrent
+        $env:PATH += ";C:\qbt\bin"
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost_1_87_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -Wno-dev
+        cmake --build build
+        cmake --install build
+    - name: qbittorrent
+      run: |
+        $env:PATH += ";C:\qbt\bin"
+        aria2c https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_4_x.zip
+        7z x qBittorrent-4_4_x.zip
+        cd qBittorrent-4_4_x
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent445 -DBOOST_ROOT=C:\qbt\boost_1_87_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
+        cmake --build build
+        cmake --install build
+        aria2c https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_5_x.zip
+        7z x qBittorrent-4_5_x.zip
+        cd qBittorrent-4_5_x
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent455 -DBOOST_ROOT=C:\qbt\boost_1_87_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
+        cmake --build build
+        cmake --install build
+        aria2c https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_6_x.zip
+        7z x qBittorrent-4_6_x.zip
+        cd qBittorrent-4_6_x
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent467 -DBOOST_ROOT=C:\qbt\boost_1_87_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
+        cmake --build build
+        cmake --install build
+    - uses: actions/upload-artifact@v4
 
-      - name: Clone and Build Zlib
-        run: |
-          git clone --branch v1.3.1 https://github.com/madler/zlib.git C:\qbt\zlib
-          cd C:\qbt\zlib
-          $env:PATH += ";C:\qbt\bin"
-          nmake -f win32/Makefile.msc
-          xcopy zconf.h C:\qbt\zlib\include\
-          xcopy zlib.h C:\qbt\zlib\include\
-          xcopy zlib.lib C:\qbt\zlib\lib\
-
-      - name: Build OpenSSL
-        run: |
-          git clone --branch openssl-3.4.0 https://github.com/openssl/openssl.git C:\qbt\openssl
-          cd C:\qbt\openssl
-          $env:PATH += ";C:\qbt\bin"
-          perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt\openssl /FS
-          jom
-          nmake install
-
-      - name: Build Qt
-        run: |
-          git clone --branch v5.15.14-lts-lgpl https://code.qt.io/qt/qt5.git C:\qbt\qt5
-          cd C:\qbt\qt5
-          $env:PATH += ";C:\qbt\bin"
-          git submodule update --init qtbase qtsvg qttools qtwinextras
-          .\configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib -I C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -openssl-linked
-          jom
-          jom install
-
-      - name: Build libtorrent
-        run: |
-          git clone --branch RC_1_2 https://github.com/arvidn/libtorrent.git C:\qbt\libtorrent
-          cd C:\qbt\libtorrent
-          $env:PATH += ";C:\qbt\bin"
-          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSTATIC_RUNTIME=ON -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -Wno-dev
-          cmake --build build
-          cmake --install build
-
-      - name: Build qBittorrent 4.4.x
-        run: |
-          aria2c -d C:\qbt\downloads -o qBittorrent-4_4_x.zip "https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_4_x.zip"
-          7z x "C:\qbt\downloads\qBittorrent-4_4_x.zip" -oC:\qbt\qBittorrent-4_4_x
-          cd C:\qbt\qBittorrent-4_4_x\qBittorrent-4_4_x
-          $env:PATH += ";C:\qbt\bin"
-          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent445 -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\Qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
-          cmake --build build
-          cmake --install build
-
-      - name: Build qBittorrent 4.5.x
-        run: |
-          aria2c -d C:\qbt\downloads -o qBittorrent-4_5_x.zip "https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_5_x.zip"
-          7z x "C:\qbt\downloads\qBittorrent-4_5_x.zip" -oC:\qbt\qBittorrent-4_5_x
-          cd C:\qbt\qBittorrent-4_5_x\qBittorrent-4_5_x
-          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent455 -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\Qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
-          cmake --build build
-          cmake --install build
-
-      - name: Build qBittorrent 4.6.x
-        run: |
-          aria2c -d C:\qbt\downloads -o qBittorrent-4_6_x.zip "https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_6_x.zip"
-          7z x "C:\qbt\downloads\qBittorrent-4_6_x.zip" -oC:\qbt\qBittorrent-4_6_x
-          cd C:\qbt\qBittorrent-4_6_x\qBittorrent-4_6_x
-          $env:PATH += ";C:\qbt\bin"
-          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DMSVC_RUNTIME_DYNAMIC=OFF -DSTACKTRACE=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\upload\qbittorrent467 -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -DZLIB_ROOT=C:\qbt\zlib -DQt5_DIR=C:\qbt\qt5\lib\cmake\Qt5 -DLibtorrentRasterbar_DIR=C:\qbt\libtorrent\lib\cmake\LibtorrentRasterbar -Wno-dev
-          cmake --build build
-          cmake --install build
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: qbittorrent
-          path: C:\qbt\upload
+      with:
+        name: qbittorrent
+        path: C:\qbt\upload
