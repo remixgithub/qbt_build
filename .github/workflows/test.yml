@@ -1,146 +1,66 @@
-name: Build qBittorrent Static Windows
+name: test.yml
 
 on: workflow_dispatch
 
 jobs:
-  build_qbittorrent_503:
+  build:
     runs-on: windows-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
       with:
         msystem: MINGW64
         update: true
-        install: > 
-          git 
-          mingw-w64-x86_64-toolchain 
-          mingw-w64-x86_64-cmake 
-          mingw-w64-x86_64-boost 
+        install: >-
+          git
+          make
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-boost
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-qt6
+          mingw-w64-x86_64-qt5
+          mingw-w64-x86_64-openssl
           mingw-w64-x86_64-zlib
-          mingw-w64-x86_64-python3
 
-    - name: Install OpenSSL 3.4.0
+    - name: Install libtorrent
+      shell: msys2 {0}
       run: |
-        cd ${{ github.workspace }}
-        curl -LO "https://www.openssl.org/source/openssl-3.4.0.tar.gz"
-        tar -xzf openssl-3.4.0.tar.gz
-        cd openssl-3.4.0
-        perl Configure mingw64 no-shared --prefix=\mingw64
-        make
-        make install
-
-    - name: Install Qt 6.5.4
-      run: |
-        cd ${{ github.workspace }}
-        curl -LO "https://download.qt.io/official_releases/qt/6.5/6.5.4/submodules/qtbase-everywhere-src-6.5.4.zip"
-        7z x qtbase-everywhere-src-6.5.4.zip
-        cd qtbase-everywhere-src-6.5.4
-        mkdir build
-        cd build
-        ../configure -static -opensource -confirm-license -platform win32-g++ -prefix /mingw64
-        mingw32-make
-        mingw32-make install
-
-    - name: Clone and build libtorrent 1.2.20
-      run: |
-        cd ${{ github.workspace }}
-        git clone --branch libtorrent-1.2.20 --depth 1 https://github.com/arvidn/libtorrent.git
+        cd /c
+        git clone --recursive --depth 1 --branch v1.2.20 https://github.com/arvidn/libtorrent.git
         cd libtorrent
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/mingw64 -DBUILD_SHARED_LIBS=OFF
-        cmake --build . --config Release
-        cmake --install . --prefix /mingw64
+        mkdir build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/c/libtorrent-install ..
+        cmake --build . --config Release --parallel
+        cmake --install .
 
-    - name: Clone and build qBittorrent 5.0.3
+    - name: Build qBittorrent 5.0.3
+      shell: msys2 {0}
       run: |
-        cd ${{ github.workspace }}
-        git clone --branch release-5.0.3 --depth 1 https://github.com/qbittorrent/qBittorrent.git
+        cd /c
+        git clone --recursive --depth 1 --branch release-5.0.3 https://github.com/qbittorrent/qBittorrent.git
         cd qBittorrent
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/mingw64 -DCMAKE_PREFIX_PATH="/mingw64" -DGUI=ON -DSTATICLINK=ON
-        cmake --build . --config Release
-        cd ..
-        cp ${{ github.workspace }}/qBittorrent/build/release/qbittorrent.exe ${{ github.workspace }}/qbittorrent_503.exe
+        mkdir build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="/c/libtorrent-install;/mingw64" -DQT6=ON -DOPENSSL_ROOT_DIR="/mingw64" ..
+        cmake --build . --config Release --parallel
+        cp ./release/qbittorrent.exe /c/qbittorrent_503.exe
 
-    - name: Upload qbittorrent_503 artifact
+    - name: Build qBittorrent 4.4.5
+      shell: msys2 {0}
+      run: |
+        cd /c
+        git clone --recursive --depth 1 --branch release-4.4.5 https://github.com/qbittorrent/qBittorrent.git qbittorrent_445
+        cd qbittorrent_445
+        mkdir build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="/c/libtorrent-install;/mingw64" -DQT6=OFF -DOPENSSL_ROOT_DIR="/mingw64" ..
+        cmake --build . --config Release --parallel
+        cp ./release/qbittorrent.exe /c/qbittorrent_445.exe
+
+    - name: Upload Artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: qbittorrent_503
-        path: ${{ github.workspace }}/qbittorrent_503.exe
-
-  build_qbittorrent_445:
-    runs-on: windows-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: MINGW64
-        update: true
-        install: > 
-          git 
-          mingw-w64-x86_64-toolchain 
-          mingw-w64-x86_64-cmake 
-          mingw-w64-x86_64-boost 
-          mingw-w64-x86_64-zlib
-          mingw-w64-x86_64-python3
-
-    - name: Install OpenSSL 3.4.0
-      run: |
-        cd ${{ github.workspace }}
-        curl -LO "https://www.openssl.org/source/openssl-3.4.0.tar.gz"
-        tar -xzf openssl-3.4.0.tar.gz
-        cd openssl-3.4.0
-        perl Configure mingw64 no-shared --prefix=/mingw64
-        make
-        make install
-
-    - name: Install Qt 5.15.16
-      run: |
-        cd ${{ github.workspace }}
-        curl -LO "https://download.qt.io/official_releases/qt/5.15/5.15.16/submodules/qtbase-everywhere-src-5.15.16.zip"
-        7z x qtbase-everywhere-src-5.15.16.zip
-        cd qtbase-everywhere-src-5.15.16
-        mkdir build
-        cd build
-        ../configure -static -opensource -confirm-license -platform win32-g++ -prefix /mingw64
-        mingw32-make
-        mingw32-make install
-
-    - name: Clone and build libtorrent 1.2.20
-      run: |
-        cd ${{ github.workspace }}
-        git clone --branch libtorrent-1.2.20 --depth 1 https://github.com/arvidn/libtorrent.git
-        cd libtorrent
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/mingw64 -DBUILD_SHARED_LIBS=OFF
-        cmake --build . --config Release
-        cmake --install . --prefix /mingw64
-
-    - name: Clone and build qBittorrent 4.4.5
-      run: |
-        cd ${{ github.workspace }}
-        git clone --branch release-4.4.5 --depth 1 https://github.com/qbittorrent/qBittorrent.git
-        cd qBittorrent
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/mingw64 -DCMAKE_PREFIX_PATH="/mingw64" -DGUI=ON -DSTATICLINK=ON
-        cmake --build . --config Release
-        cd ..
-        cp ${{ github.workspace }}/qBittorrent/build/release/qbittorrent.exe ${{ github.workspace }}/qbittorrent_445.exe
-
-    - name: Upload qbittorrent_445 artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: qbittorrent_445
-        path: ${{ github.workspace }}/qbittorrent_445.exe
+        name: qbittorrent-builds
+        path: |
+          /c/qbittorrent_503.exe
+          /c/qbittorrent_445.exe
