@@ -11,9 +11,9 @@ jobs:
         git clone --branch v1.3.1 https://github.com/madler/zlib.git
         cd zlib
         nmake -f win32/Makefile.msc
-        xcopy zconf.h C:\qbt\zlib\include
-        xcopy zlib.h C:\qbt\zlib\include
-        xcopy zlib.lib C:\qbt\zlib\lib
+        xcopy zconf.h C:\qbt\zlib\include\
+        xcopy zlib.h C:\qbt\zlib\include\
+        xcopy zlib.lib C:\qbt\zlib\lib\
     - name: openssl
       run: |
         aria2c https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/win64/nasm-2.16.03-win64.zip
