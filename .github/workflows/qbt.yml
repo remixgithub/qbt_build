@@ -4,7 +4,7 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-    - uses: ilammy/msvc-dev-cmd@v4
+    - uses: ilammy/msvc-dev-cmd@v1
     - name: zlib
       run: |
         git clone --branch v1.3.1 https://github.com/madler/zlib.git
