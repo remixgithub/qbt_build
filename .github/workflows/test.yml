@@ -1,0 +1,29 @@
+name: test
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Set up vcpkg
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git
+        .\vcpkg\bootstrap-vcpkg.bat
+        echo "VCPKG_ROOT=$env:GITHUB_WORKSPACE\vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: Install qBittorrent dependencies (x64-windows-static)
+      run: |
+        $env:VCPKG_DEFAULT_TRIPLET="x64-windows-static"
+        .\vcpkg\vcpkg install libtorrent openssl zlib qtbase qtsvg qttools
+
+    - name: Build qBittorrent
+      run: |
+        git clone https://github.com/qbittorrent/qBittorrent.git
+        cd qBittorrent
+        git checkout v5_0_x
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static -DQT6=ON
+        cmake --build . --config Release
