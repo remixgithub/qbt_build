@@ -39,7 +39,7 @@ jobs:
     - name: boost
       run: |
         aria2c https://archives.boost.io/release/1.86.0/source/boost_1_86_0.7z
-        7z x -oC:\qbt\ boost_1_87_0.7z
+        7z x -oC:\qbt\ boost_1_86_0.7z
     - name: libtorrent
       run: |
         git clone --branch RC_1_2 https://github.com/arvidn/libtorrent.git
