@@ -5,7 +5,6 @@ jobs:
     runs-on: windows-2019
     steps:
     - uses: ilammy/msvc-dev-cmd@v1
-
     - name: zlib
       run: |
         git clone --branch v1.3.1 https://github.com/madler/zlib.git
@@ -24,7 +23,7 @@ jobs:
         xcopy jom.exe C:\qbt\bin\
         git clone --branch openssl-3.4.0 https://github.com/openssl/openssl.git
         cd openssl
-        $env:PATH += ";C:\qbt\bin"
+        $env:PATH += ";C:\qbt\bin\"
         perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt\openssl /FS
         jom
         nmake install_sw
@@ -34,24 +33,24 @@ jobs:
         cd qt5
         git submodule update --init qtbase qtsvg qttools qtwinextras
         .\configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib -I C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -openssl-linked
-        $env:PATH += ";C:\qbt\bin"
+        $env:PATH += ";C:\qbt\bin\"
         jom
         jom install
     - name: boost
       run: |
-        aria2c https://archives.boost.io/release/1.86.0/source/boost_1_86_0.7z
-        7z x -oC:\qbt\ boost_1_87_0.7z
+        aria2c https://boostorg.jfrog.io/artifactory/main/release/1.86.0/source/boost_1_86_0.7z
+        7z x -oC:\qbt\ boost_1_86_0.7z
     - name: libtorrent
       run: |
         git clone --branch RC_1_2 https://github.com/arvidn/libtorrent.git
         cd libtorrent
-        $env:PATH += ";C:\qbt\bin"
-        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost_1_87_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -Wno-dev
+        $env:PATH += ";C:\qbt\bin\"
+        cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -Wno-dev
         cmake --build build
         cmake --install build
     - name: qbittorrent
       run: |
-        $env:PATH += ";C:\qbt\bin"
+        $env:PATH += ";C:\qbt\bin\"
         aria2c https://github.com/qbittorrent/qBittorrent/archive/refs/heads/v4_4_x.zip
         7z x qBittorrent-4_4_x.zip
         cd qBittorrent-4_4_x
@@ -71,7 +70,6 @@ jobs:
         cmake --build build
         cmake --install build
     - uses: actions/upload-artifact@v4
-
       with:
         name: qbittorrent
         path: C:\qbt\upload
