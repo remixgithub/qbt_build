@@ -1,0 +1,51 @@
+name: test2
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout qBittorrent
+        uses: actions/checkout@v4
+        with:
+          repository: qbittorrent/qBittorrent
+          ref: v5_0_x
+          path: qbittorrent
+
+      - name: Checkout libtorrent
+        uses: actions/checkout@v4
+        with:
+          repository: arvidn/libtorrent
+          ref: RC_1_2
+          path: libtorrent
+
+      - name: Install vcpkg dependencies
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git vcpkg
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg install openssl zlib qtbase qtsvg qttools --triplet x64-windows-static
+
+      - name: Install Boost
+        run: |
+          git clone --branch boost-1.86.0 --depth 1 https://github.com/boostorg/boost.git
+          cd boost
+          .\bootstrap.bat
+          .\b2 install --prefix=boost-install --with-system --with-filesystem --with-thread --with-chrono --with-random --with-date_time --with-regex --with-atomic
+
+      - name: Build libtorrent
+        run: |
+          cd libtorrent
+          cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=../boost-install
+          cmake --build build --config Release
+
+      - name: Build qBittorrent
+        run: |
+          cd qbittorrent
+          cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DLibtorrentRasterbar_DIR=../libtorrent/build -DBOOST_ROOT=../boost-install
+          cmake --build build --config Release
+
+      - name: Upload qBittorrent artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: qbittorrent-executable
+          path: qbittorrent/build/bin/Release/qbittorrent.exe
