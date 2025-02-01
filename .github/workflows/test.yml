@@ -47,3 +47,8 @@ jobs:
         cd build
         cmake .. -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static -DBOOST_ROOT="$env:BOOST_ROOT" -DLibtorrentRasterbar_ROOT="$env:LIBTORRENT_ROOT" -DBoost_USE_STATIC_LIBS=ON
         cmake --build . --config Release
+    - name: Upload qBittorrent.exe as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qBittorrent
+        path: qBittorrent/build/qbittorrent.exe
