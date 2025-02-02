@@ -7,7 +7,7 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1
     - name: zlib
       run: |
-        git clone --branch v1.3.1 https://github.com/madler/zlib.git
+        git clone --branch v1.3.1 --depth 1 https://github.com/madler/zlib.git
         cd zlib
         nmake -f win32/Makefile.msc
         xcopy zconf.h C:\qbt\zlib\include\
@@ -21,7 +21,7 @@ jobs:
         aria2c https://download.qt.io/official_releases/jom/jom_1_1_4.zip
         7z x jom_1_1_4.zip
         xcopy jom.exe C:\qbt\bin\
-        git clone --branch openssl-3.4.0 https://github.com/openssl/openssl.git
+        git clone --branch openssl-3.4.0 --depth 1 https://github.com/openssl/openssl.git
         cd openssl
         $env:PATH += ";C:\qbt\bin\"
         perl Configure VC-WIN64A no-shared no-tests --prefix=C:\qbt\openssl /FS
@@ -29,7 +29,7 @@ jobs:
         nmake install_sw
     - name: qt
       run: |
-        git clone --branch v5.15.14-lts-lgpl https://github.com/qt/qt5.git
+        git clone --branch v5.15.14-lts-lgpl --depth 1 https://github.com/qt/qt5.git
         cd qt5
         git submodule update --init qtbase qtsvg qttools qtwinextras
         .\configure.bat -prefix C:\qbt\qt5 -I C:\qbt\zlib\include -L C:\qbt\zlib\lib -I C:\qbt\openssl\include -L C:\qbt\openssl\lib -release -opensource -confirm-license -static -static-runtime -nomake examples -openssl-linked
@@ -42,7 +42,7 @@ jobs:
         7z x -oC:\qbt\ boost_1_86_0.7z
     - name: libtorrent
       run: |
-        git clone --branch RC_1_2 https://github.com/arvidn/libtorrent.git
+        git clone --branch RC_1_2 --depth 1 https://github.com/arvidn/libtorrent.git
         cd libtorrent
         $env:PATH += ";C:\qbt\bin\"
         cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dstatic_runtime=ON -Ddeprecated-functions=OFF -DCMAKE_INSTALL_PREFIX=C:\qbt\libtorrent -DBOOST_ROOT=C:\qbt\boost_1_86_0 -DOPENSSL_ROOT_DIR=C:\qbt\openssl -Wno-dev
