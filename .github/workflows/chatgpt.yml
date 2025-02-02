@@ -27,9 +27,27 @@ jobs:
           cd qt6
           perl init-repository --module-subset=qtbase,qtsvg,qttools
 
-      - name: Install Build Tools
+      - name: Install Dependencies
         run: |
-          choco install ninja perl cmake python -y
+          curl -LO https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip
+          mkdir ninja
+          powershell -command "Expand-Archive ninja-win.zip -DestinationPath ninja"
+          echo "$GITHUB_WORKSPACE/ninja" >> $GITHUB_PATH
+          
+          curl -LO https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit-portable.zip
+          mkdir perl
+          powershell -command "Expand-Archive strawberry-perl-5.32.1.1-64bit-portable.zip -DestinationPath perl"
+          echo "$GITHUB_WORKSPACE/perl/perl/bin" >> $GITHUB_PATH
+          
+          curl -LO https://github.com/Kitware/CMake/releases/download/v3.27.4/cmake-3.27.4-windows-x86_64.zip
+          mkdir cmake
+          powershell -command "Expand-Archive cmake-3.27.4-windows-x86_64.zip -DestinationPath cmake"
+          echo "$GITHUB_WORKSPACE/cmake/bin" >> $GITHUB_PATH
+          
+          curl -LO https://www.python.org/ftp/python/3.11.6/python-3.11.6-embed-amd64.zip
+          mkdir python
+          powershell -command "Expand-Archive python-3.11.6-embed-amd64.zip -DestinationPath python"
+          echo "$GITHUB_WORKSPACE/python" >> $GITHUB_PATH
 
       - name: Build Qt6
         run: |
