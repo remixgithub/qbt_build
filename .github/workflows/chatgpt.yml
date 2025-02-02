@@ -1,5 +1,7 @@
-name: test2
+name: Build qBittorrent
+
 on: workflow_dispatch
+
 jobs:
   build:
     runs-on: windows-latest
@@ -19,15 +21,27 @@ jobs:
           ref: RC_1_2
           path: libtorrent
 
-      - name: Install vcpkg dependencies
+      - name: Checkout Qt6
         run: |
-          git clone https://github.com/microsoft/vcpkg.git vcpkg
-          .\vcpkg\bootstrap-vcpkg.bat
-          .\vcpkg\vcpkg install openssl zlib qtbase qtsvg qttools --triplet x64-windows-static
+          git clone --branch v6.6.0 --depth 1 https://github.com/qt/qt5.git qt6
+          cd qt6
+          perl init-repository --module-subset=qtbase,qtsvg,qttools
+
+      - name: Install Build Tools
+        run: |
+          choco install ninja perl cmake python -y
+
+      - name: Build Qt6
+        run: |
+          cd qt6
+          mkdir build
+          cd build
+          cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../qt-install ..
+          cmake --build . --target install
 
       - name: Install Boost
         run: |
-          git clone --branch boost-1.86.0 --depth 1 https://github.com/boostorg/boost.git
+          git clone --branch boost-1.83.0 --depth 1 https://github.com/boostorg/boost.git
           cd boost
           .\bootstrap.bat
           .\b2 install --prefix=boost-install --with-system --with-filesystem --with-thread --with-chrono --with-random --with-date_time --with-regex --with-atomic
@@ -35,13 +49,13 @@ jobs:
       - name: Build libtorrent
         run: |
           cd libtorrent
-          cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=../boost-install
+          cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=../boost-install
           cmake --build build --config Release
 
       - name: Build qBittorrent
         run: |
           cd qbittorrent
-          cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DLibtorrentRasterbar_DIR=../libtorrent/build -DBOOST_ROOT=../boost-install
+          cmake -B build -S . -DCMAKE_PREFIX_PATH=../qt6/qt-install -DCMAKE_BUILD_TYPE=Release -DLibtorrentRasterbar_DIR=../libtorrent/build -DBOOST_ROOT=../boost-install
           cmake --build build --config Release
 
       - name: Upload qBittorrent artifact
