@@ -1,7 +1,6 @@
 name: Build libtorrent and qBittorrent with Qt6 from source (Windows Static)
 
 on: workflow_dispatch
-
 jobs:
   build:
     runs-on: windows-latest
@@ -37,13 +36,13 @@ jobs:
         .\bootstrap.bat
         .\b2 --prefix=.\stage --with-system --with-filesystem --with-thread --with-chrono --with-date_time --with-regex --with-atomic --with-random --with-iostreams variant=release link=static runtime-link=static address-model=64
 
-    - name: Clone and build libtorrent
+    - name: Clone and build libtorrent (RC_1_2 branch)
       run: |
-        git clone https://github.com/arvidn/libtorrent.git
+        git clone --branch RC_1_2 https://github.com/arvidn/libtorrent.git
         cd libtorrent
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=.\install -DBOOST_ROOT="$env:BOOST_ROOT" -DBoost_USE_STATIC_LIBS=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="/MT" -DCMAKE_C_FLAGS="/MT"
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=.\install -DBOOST_ROOT="$env:BOOST_ROOT" -DBoost_USE_STATIC_LIBS=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="/MT" -DCMAKE_C_FLAGS="/MT" -Dstatic_runtime=ON -Dbuild_type=release
         cmake --build . --config Release
         cmake --install . --config Release
         echo "LIBTORRENT_ROOT=$env:GITHUB_WORKSPACE\libtorrent\build\install" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -67,9 +66,9 @@ jobs:
         cmake --install .
         echo "QT6_INSTALL_DIR=$env:QT6_ROOT\build\install" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-    - name: Clone qBittorrent repository
+    - name: Clone qBittorrent repository (v5_0_x branch)
       run: |
-        git clone https://github.com/qbittorrent/qBittorrent.git
+        git clone --branch v5_0_x https://github.com/qbittorrent/qBittorrent.git
         cd qBittorrent
         git submodule update --init --recursive
 
