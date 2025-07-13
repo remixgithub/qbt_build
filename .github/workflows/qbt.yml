@@ -9,10 +9,7 @@ jobs:
       run: |
         git clone --branch v1.3.1 --depth 1 https://github.com/madler/zlib.git
         cd zlib
-        nmake -f win32/Makefile.msc
-        xcopy zconf.h C:\qbt\zlib\include\
-        xcopy zlib.h C:\qbt\zlib\include\
-        xcopy zlib.lib C:\qbt\zlib\lib\
+        nmake -f win32/Makefile.msc ARCH=amd64 install INCLUDE="C:\qbt\zlib\include" LIB="C:\qbt\zlib\lib" BINARY_PATH="C:\qbt\zlib\bin"
     - name: openssl
       run: |
         aria2c https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/win64/nasm-2.16.03-win64.zip
